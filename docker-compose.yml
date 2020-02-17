@@ -1,0 +1,41 @@
+# https://www.docker.elastic.co/
+
+version: '3.1'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.1
+    container_name: elasticsearch
+    environment:
+      - cluster.name=docker-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./volumes/elasticsearch/data:/usr/share/elasticsearch
+    ports:
+      - 9200:9200
+      - 9300:9300
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.7.1
+    container_name: logstash
+    volumes:
+      - ./volumes/logstash/pipeline:/usr/share/logstash/pipeline
+      - ./volumes/logstash/log:/var/log
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.7.1
+    container_name: kibana
+    links:
+      - elasticsearch:elasticsearch
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch

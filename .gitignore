@@ -1,0 +1,5 @@
+# volumes
+volumes/elasticsearch/data/*
+!volumes/elasticsearch/data/.keep
+volumes/logstash/logs/*
+!volumes/logstash/logs/.keep
